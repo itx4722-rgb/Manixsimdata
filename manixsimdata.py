@@ -12,7 +12,7 @@ RESET='\033[0m'
 def clear():
     os.system('clear' if os.name == 'posix' else 'cls')
 
-def jbk_banner():
+def MANI_banner():
     clear()
 
     art = """
@@ -42,20 +42,22 @@ def jbk_banner():
     print(f"{W} STATUS : {Y}DATABASE ACCESS ACTIVE")
     print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
 
-defopen_map(address):
+def open_map(address):
     clean_addr = address.replace('null','').replace('no','').replace('-','').strip()
     search_url = f"https://www.google.com/maps/search/{clean_addr.replace(' ','+')}"
     print(f"\n{G}[+] Opening Map for Valid Location...{RESET}")
     os.system(f"termux-open-url '{search_url}'")
 
-defetch_data(num):
+def fetch_data(num):
 
-    jbk_banner()
+    MANI_banner()
     print(f"\n{W}[{G}*{W}] {C}BYPASSING DATABASE SECURITY...{RESET}")
 
     url=f"https://howler-database-api.vercel.app/api/lookup?phone={num}"
-try:
-res=requests.get(url,timeout=15).json()
+
+    try:
+
+        res=requests.get(url,timeout=15).json()
 
         target_address=""
 
@@ -125,7 +127,7 @@ def main():
 
             fetch_data(n)
 
-        elif cmd=="02":
+elif    cmd=="02":
 
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
