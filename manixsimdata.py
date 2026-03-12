@@ -12,7 +12,7 @@ RESET='\033[0m'
 def clear():
     os.system('clear' if os.name == 'posix' else 'cls')
 
-def MANI_banner():
+def jbk_banner():
     clear()
 
     art = """
@@ -50,7 +50,7 @@ def open_map(address):
 
 def fetch_data(num):
 
-    MANI_banner()
+    jbk_banner()
     print(f"\n{W}[{G}*{W}] {C}BYPASSING DATABASE SECURITY...{RESET}")
 
     url=f"https://howler-database-api.vercel.app/api/lookup?phone={num}"
@@ -127,7 +127,7 @@ def main():
 
             fetch_data(n)
 
-elif    cmd=="02":
+        elif cmd=="02":
 
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
