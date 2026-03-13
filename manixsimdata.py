@@ -1,22 +1,23 @@
-import os, requests, sys
+import os
+import requests
+import sys
 
 # Colors
 R='\033[1;31m'
 G='\033[1;32m'
 Y='\033[1;33m'
-B='\033[1;34m'
 C='\033[1;36m'
 W='\033[1;37m'
 RESET='\033[0m'
 
 def clear():
-    os.system('clear')
+    os.system("clear")
 
 def banner():
 
     clear()
 
-    art = """
+    art="""
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⣄⠘⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣀⠀⠀⢢⣤⣀⣦⣄⡀⠙⣶⡘⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -35,61 +36,49 @@ def banner():
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀
 """
 
-    print(f"{B}{art}{RESET}")
-    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print(f"{W}OWNER  : {G}MANI X KING")
-    print(f"{W}TEAM   : {R}BLACK HAT HACKERS")
-    print(f"{W}STATUS : {Y}DATABASE ACCESS ACTIVE")
-    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
+    print(C+art+RESET)
+    print(C+"━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print(W+"OWNER  : "+G+"MANI X KING")
+    print(W+"TEAM   : "+R+"BLACK HAT HACKERS")
+    print(C+"━━━━━━━━━━━━━━━━━━━━━━━━━━━━"+RESET)
 
-def open_map(addr):
+def format_number(num):
 
-    clean=addr.replace(" ","+")
-    url=f"https://www.google.com/maps/search/{clean}"
+    if num.startswith("03"):
+        num="92"+num[1:]
 
-    print(f"\n{G}[+] Opening Google Maps...{RESET}")
+    return num
 
-    os.system(f"termux-open-url '{url}'")
+def search_number():
 
-def fetch(num):
+    num=input(Y+"Enter Number (03xxxxxxxxx): "+W)
 
-    banner()
+    num=format_number(num)
 
-    print(f"\n{C}[+] Searching database...{RESET}")
+    url=f"https://wasif-ali-simdatabase-api.vercel.app/api/lookup?query={num}"
 
-    url=f"https://wasif-ali-pak-sim-info.vercel.app/API/lookup.js?query={num}"
+    print(C+"\nSearching database...\n"+RESET)
 
     try:
 
-        data=requests.get(url,timeout=15).json()
+        r=requests.get(url,timeout=10)
 
-        print(f"\n{C}━━━━━━━━ RESULT ━━━━━━━━{RESET}")
-
-        address=""
+        data=r.json()
 
         if data:
 
+            print(G+"Result Found\n")
+
             for k,v in data.items():
-
-                print(f"{G}{k.upper()} {W}: {v}")
-
-                if "address" in k.lower():
-                    address=v
+                print(W+str(k)+" : "+Y+str(v))
 
         else:
-
-            print(f"{R}No records found{RESET}")
-
-        if address:
-
-            ask=input(f"\n{Y}Open location in map? (y/n): ")
-
-            if ask=="y":
-                open_map(address)
+            print(R+"No record found")
 
     except:
+        print(R+"API error or server down")
 
-        print(f"{R}API ERROR OR SERVER DOWN{RESET}")
+    input("\nPress Enter to continue")
 
 def main():
 
@@ -97,25 +86,19 @@ def main():
 
         banner()
 
-        print(f"\n{W}[{G}1{W}] Search Number")
-        print(f"{W}[{G}2{W}] WhatsApp Channel")
-        print(f"{W}[{R}0{W}] Exit")
+        print("\n"+W+"1 Search Number")
+        print("02 WhatsApp Channel")
+        print("0 Exit")
 
-        cmd=input(f"\n{G}MANI@SYSTEM:$ ")
+        cmd=input("\nSelect option: ")
 
         if cmd=="1":
-
-            num=input(f"\n{Y}Enter Number (03xxxxxxxxx): ")
-
-            fetch(num)
+            search_number()
 
         elif cmd=="2":
-
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
         elif cmd=="0":
-
             sys.exit()
 
-if __name__=="__main__":
-    main()
+main()
