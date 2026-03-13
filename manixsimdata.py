@@ -1,4 +1,7 @@
-import os,requests,sys,time
+import os
+import requests
+import sys
+import time
 
 # Colors
 R='\033[1;31m'
@@ -13,10 +16,8 @@ def clear():
     os.system("clear")
 
 def banner():
-
     clear()
-
-    art="""
+    art = """
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⡀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠱⣄⠘⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⣀⠀⠀⢢⣤⣀⣦⣄⡀⠙⣶⡘⢷⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -34,7 +35,6 @@ def banner():
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀
 """
-
     print(f"{B}{art}{RESET}")
     print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     print(f"{W}OWNER  : {G}MANI X KING")
@@ -43,30 +43,25 @@ def banner():
     print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
 
 def loading():
-
-    print(f"\n{C}[+] Accessing Secure Database",end="")
-
+    print(f"\n{C}[+] Accessing Secure Database", end="")
     for i in range(5):
         time.sleep(0.4)
-        print(".",end="",flush=True)
-
+        print(".", end="", flush=True)
     print("\n")
 
 def open_map(addr):
-
-    clean=addr.replace(" ","+")
-    url=f"https://www.google.com/maps/search/{clean}"
-
+    if not addr:
+        return
+    clean = addr.replace(" ", "+")
+    url = f"https://www.google.com/maps/search/{clean}"
     print(f"{G}[+] Opening Google Maps...{RESET}")
-
     os.system(f"termux-open-url '{url}'")
 
-def result_box(data):
-
-    name=data.get("name","N/A")
-    cnic=data.get("cnic","N/A")
-    number=data.get("number","N/A")
-    address=data.get("address","N/A")
+def result_box(record):
+    name = record.get("name", "N/A")
+    cnic = record.get("cnic", "N/A")
+    number = record.get("number", "N/A")
+    address = record.get("address", "N/A")
 
     print(f"""{C}
 ╔══════════════════════════════════════╗
@@ -81,69 +76,64 @@ def result_box(data):
 ╚══════════════════════════════════════╝
 {RESET}""")
 
-    if address!="N/A":
+    if address != "N/A":
         open_map(address)
 
-def fetch(query):
-
+def fetch(num):
     banner()
     loading()
-
-    url=f"https://wasif-ali-simdatabase-api.vercel.app/api/lookup?query={query}"
+    url = f"https://wasif-ali-simdatabase-api.vercel.app/api/lookup?query={num}"
 
     try:
-
-        res=requests.get(url,timeout=15).json()
+        res = requests.get(url, timeout=15).json()
 
         if not res:
-            print(f"{R}No Records Found{RESET}")
+            print(R + "No Records Found" + RESET)
+            input("\nPress Enter to continue...")
             return
 
-        if isinstance(res,list):
-
-            print(f"{Y}[+] Multiple Records Found : {len(res)}\n")
-
+        if isinstance(res, list):
+            print(f"{Y}[+] Multiple Records Found: {len(res)}\n")
             for r in res:
                 result_box(r)
-
-        else:
+        elif isinstance(res, dict):
             result_box(res)
+        else:
+            print(R + "Unexpected API response format" + RESET)
 
-    except:
-        print(f"{R}API ERROR OR SERVER DOWN{RESET}")
+    except Exception as e:
+        print(R + f"API error or server down ({e})" + RESET)
+
+    input("\nPress Enter to continue...")
+
+def format_number(num):
+    if num.startswith("03"):
+        num = "92" + num[1:]
+    return num
 
 def main():
-
     while True:
-
         banner()
+        print(f"\n{W}[01] Search Number")
+        print(f"{W}[02] Search CNIC")
+        print(f"{W}[03] WhatsApp Channel")
+        print(f"{W}[00] Exit")
 
-        print(f"\n{W}[{G}01{W}] Search Number")
-        print(f"{W}[{G}02{W}] Search CNIC")
-        print(f"{W}[{G}03{W}] WhatsApp Channel")
-        print(f"{W}[{R}00{W}] Exit")
+        cmd = input(f"\n{G}MANI@SYSTEM:$ ").strip()
 
-        cmd=input(f"\n{G}MANI@SYSTEM:$ ")
+        if cmd == "01":
+            num = input(f"\n{Y}Enter Number (03xxxxxxxxx): {W}").strip()
+            fetch(format_number(num))
 
-        if cmd=="01":
-
-            num=input(f"\n{Y}Enter Number (92xxxxxxxxxx): ")
-            fetch(num)
-            input(f"\n{C}Press Enter To Continue...")
-
-        elif cmd=="02":
-
-            cnic=input(f"\n{Y}Enter CNIC (xxxxxxxxxxxxx): ")
+        elif cmd == "02":
+            cnic = input(f"\n{Y}Enter CNIC (xxxxxxxxxxxxx): {W}").strip()
             fetch(cnic)
-            input(f"\n{C}Press Enter To Continue...")
 
-        elif cmd=="03":
-
+        elif cmd == "03":
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
-        elif cmd=="00":
-
+        elif cmd == "00":
             sys.exit()
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
