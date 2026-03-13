@@ -1,11 +1,10 @@
-import os
-import requests
-import sys
+import os,requests,sys,time
 
 # Colors
 R='\033[1;31m'
 G='\033[1;32m'
 Y='\033[1;33m'
+B='\033[1;34m'
 C='\033[1;36m'
 W='\033[1;37m'
 RESET='\033[0m'
@@ -36,49 +35,82 @@ def banner():
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀
 """
 
-    print(C+art+RESET)
-    print(C+"━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print(W+"OWNER  : "+G+"MANI X KING")
-    print(W+"TEAM   : "+R+"BLACK HAT HACKERS")
-    print(C+"━━━━━━━━━━━━━━━━━━━━━━━━━━━━"+RESET)
+    print(f"{B}{art}{RESET}")
+    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print(f"{W}OWNER  : {G}MANI X KING")
+    print(f"{W}TEAM   : {R}BLACK HAT HACKERS")
+    print(f"{W}STATUS : {Y}DATABASE ACCESS ACTIVE")
+    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
 
-def format_number(num):
+def loading():
 
-    if num.startswith("03"):
-        num="92"+num[1:]
+    print(f"\n{C}[+] Accessing Secure Database",end="")
 
-    return num
+    for i in range(5):
+        time.sleep(0.4)
+        print(".",end="",flush=True)
 
-def search_number():
+    print("\n")
 
-    num=input(Y+"Enter Number (03xxxxxxxxx): "+W)
+def open_map(addr):
 
-    num=format_number(num)
+    clean=addr.replace(" ","+")
+    url=f"https://www.google.com/maps/search/{clean}"
 
-    url=f"https://wasif-ali-simdatabase-api.vercel.app/api/lookup?query={num}"
+    print(f"{G}[+] Opening Google Maps...{RESET}")
 
-    print(C+"\nSearching database...\n"+RESET)
+    os.system(f"termux-open-url '{url}'")
+
+def result_box(data):
+
+    name=data.get("name","N/A")
+    cnic=data.get("cnic","N/A")
+    number=data.get("number","N/A")
+    address=data.get("address","N/A")
+
+    print(f"""{C}
+╔══════════════════════════════════════╗
+║            DATABASE RESULT           ║
+╠══════════════════════════════════════╣
+║ {W}NAME     : {G}{name}
+║ {W}CNIC     : {G}{cnic}
+║ {W}NUMBER   : {G}{number}
+║ {W}ADDRESS  : {G}{address}
+╠══════════════════════════════════════╣
+║ {Y}Developed By Tool Owner MANI
+╚══════════════════════════════════════╝
+{RESET}""")
+
+    if address!="N/A":
+        open_map(address)
+
+def fetch(query):
+
+    banner()
+    loading()
+
+    url=f"https://wasif-ali-simdatabase-api.vercel.app/api/lookup?query={query}"
 
     try:
 
-        r=requests.get(url,timeout=10)
+        res=requests.get(url,timeout=15).json()
 
-        data=r.json()
+        if not res:
+            print(f"{R}No Records Found{RESET}")
+            return
 
-        if data:
+        if isinstance(res,list):
 
-            print(G+"Result Found\n")
+            print(f"{Y}[+] Multiple Records Found : {len(res)}\n")
 
-            for k,v in data.items():
-                print(W+str(k)+" : "+Y+str(v))
+            for r in res:
+                result_box(r)
 
         else:
-            print(R+"No record found")
+            result_box(res)
 
     except:
-        print(R+"API error or server down")
-
-    input("\nPress Enter to continue")
+        print(f"{R}API ERROR OR SERVER DOWN{RESET}")
 
 def main():
 
@@ -86,19 +118,32 @@ def main():
 
         banner()
 
-        print("\n"+W+"1 Search Number")
-        print("02 WhatsApp Channel")
-        print("0 Exit")
+        print(f"\n{W}[{G}01{W}] Search Number")
+        print(f"{W}[{G}02{W}] Search CNIC")
+        print(f"{W}[{G}03{W}] WhatsApp Channel")
+        print(f"{W}[{R}00{W}] Exit")
 
-        cmd=input("\nSelect option: ")
+        cmd=input(f"\n{G}MANI@SYSTEM:$ ")
 
-        if cmd=="1":
-            search_number()
+        if cmd=="01":
 
-        elif cmd=="2":
+            num=input(f"\n{Y}Enter Number (92xxxxxxxxxx): ")
+            fetch(num)
+            input(f"\n{C}Press Enter To Continue...")
+
+        elif cmd=="02":
+
+            cnic=input(f"\n{Y}Enter CNIC (xxxxxxxxxxxxx): ")
+            fetch(cnic)
+            input(f"\n{C}Press Enter To Continue...")
+
+        elif cmd=="03":
+
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
-        elif cmd=="0":
+        elif cmd=="00":
+
             sys.exit()
 
-main()
+if __name__=="__main__":
+    main()
