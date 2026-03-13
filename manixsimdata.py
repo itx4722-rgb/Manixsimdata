@@ -1,6 +1,6 @@
-import os, requests, time, sys
+import os, requests, sys
 
-# -------- Neon Colors --------
+# Colors
 R='\033[1;31m'
 G='\033[1;32m'
 Y='\033[1;33m'
@@ -10,9 +10,10 @@ W='\033[1;37m'
 RESET='\033[0m'
 
 def clear():
-    os.system('clear' if os.name == 'posix' else 'cls')
+    os.system('clear')
 
-def jbk_banner():
+def banner():
+
     clear()
 
     art = """
@@ -35,103 +36,85 @@ def jbk_banner():
 """
 
     print(f"{B}{art}{RESET}")
+    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print(f"{W}OWNER  : {G}MANI X KING")
+    print(f"{W}TEAM   : {R}BLACK HAT HACKERS")
+    print(f"{W}STATUS : {Y}DATABASE ACCESS ACTIVE")
+    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
 
-    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print(f"{W} OWNER  : {G}MANI X KING")
-    print(f"{W} TEAM   : {R}BLACK HAT HACKERS")
-    print(f"{W} STATUS : {Y}DATABASE ACCESS ACTIVE")
-    print(f"{C}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━{RESET}")
+def open_map(addr):
 
-def open_map(address):
-    clean_addr = address.replace('null','').replace('no','').replace('-','').strip()
-    search_url = f"https://www.google.com/maps/search/{clean_addr.replace(' ','+')}"
-    print(f"\n{G}[+] Opening Map for Valid Location...{RESET}")
-    os.system(f"termux-open-url '{search_url}'")
+    clean=addr.replace(" ","+")
+    url=f"https://www.google.com/maps/search/{clean}"
 
-def fetch_data(num):
+    print(f"\n{G}[+] Opening Google Maps...{RESET}")
 
-    jbk_banner()
-    print(f"\n{W}[{G}*{W}] {C}BYPASSING DATABASE SECURITY...{RESET}")
+    os.system(f"termux-open-url '{url}'")
 
-    url=f"https://howler-database-api.vercel.app/api/lookup?phone={num}"
+def fetch(num):
+
+    banner()
+
+    print(f"\n{C}[+] Searching database...{RESET}")
+
+    url=f"https://wasif-ali-pak-sim-info.vercel.app/API/lookup.js?query={num}"
 
     try:
 
-        res=requests.get(url,timeout=15).json()
+        data=requests.get(url,timeout=15).json()
 
-        target_address=""
+        print(f"\n{C}━━━━━━━━ RESULT ━━━━━━━━{RESET}")
 
-        print(f"\n{C}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-        print(f"{C}┃{W} 🔍 SEARCH RESULTS {C}┃")
-        print(f"{C}┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩")
+        address=""
 
-        if res:
+        if data:
 
-            for key,val in res.items():
+            for k,v in data.items():
 
-                k_low=str(key).lower()
+                print(f"{G}{k.upper()} {W}: {v}")
 
-                if any(x in k_low for x in ["howler","developer","status","count","query","success"]):
-                    continue
-
-                if isinstance(val,list):
-
-                    for item in val:
-
-                        for k,v in item.items():
-
-                            print(f"{C}┃ {G}{k.upper():<12} {W}: {str(v)[:25]:<25} {C}┃")
-
-                            if "address" in k.lower():
-                                target_address=v
-
-                else:
-
-                    print(f"{C}┃ {G}{key.upper():<12} {W}: {str(val)[:25]:<25} {C}┃")
-
-                    if "address" in k_low:
-                        target_address=val
+                if "address" in k.lower():
+                    address=v
 
         else:
-            print(f"{C}┃ {R}[!] NO RECORDS FOUND {C}┃")
 
-        print(f"{C}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+            print(f"{R}No records found{RESET}")
 
-        if target_address:
+        if address:
 
-            print(f"\n{Y}[>] Location Found: {W}{target_address}")
-
-            ask=input(f"{G}[?] View on Google Maps? (y/n): ").lower()
+            ask=input(f"\n{Y}Open location in map? (y/n): ")
 
             if ask=="y":
-                open_map(target_address)
+                open_map(address)
 
     except:
-        print(f"{R}[!] ERROR: UNABLE TO CONNECT TO DATABASE.")
+
+        print(f"{R}API ERROR OR SERVER DOWN{RESET}")
 
 def main():
 
     while True:
 
-        jbk_banner()
+        banner()
 
-        print(f"\n {W}[{G}01{W}] {C}DATABASE SEARCH (MAPS ENABLED)")
-        print(f" {W}[{G}02{W}] {C}WHATSAPP CHANNEL")
-        print(f" {W}[{R}00{W}] {R}EXIT SYSTEM")
+        print(f"\n{W}[{G}1{W}] Search Number")
+        print(f"{W}[{G}2{W}] WhatsApp Channel")
+        print(f"{W}[{R}0{W}] Exit")
 
-        cmd=input(f"\n {G}MANI{W}@{G}SYSTEM{W}:~$ ")
+        cmd=input(f"\n{G}MANI@SYSTEM:$ ")
 
-        if cmd=="01":
+        if cmd=="1":
 
-            n=input(f"\n {Y}[?] Enter Number (03xxxxxxxxx): ")
+            num=input(f"\n{Y}Enter Number (03xxxxxxxxx): ")
 
-            fetch_data(n)
+            fetch(num)
 
-        elif cmd=="02":
+        elif cmd=="2":
 
             os.system("termux-open-url https://whatsapp.com/channel/0029VbAkXZO6WaKm6826Fj3S")
 
-        elif cmd=="00":
+        elif cmd=="0":
+
             sys.exit()
 
 if __name__=="__main__":
